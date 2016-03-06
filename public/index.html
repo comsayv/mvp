@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <script src="/angular/angular.js" ></script>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/bootstrap.css">
+
+</head>
+<body ng-app="appName" ng-controller="MainController" >
+
+
+<div style="font-size: 12px; ">
+
+<div class="col-md-8">
+
+
+    <div ng-repeat="page in pages" style="border:solid 1px black; padding:10px; position:relative; width:800px; height: 1100px; overflow-y:auto;">
+        page {{ $index }}
+
+        <div ng-repeat="text in page.texts" style="position:absolute; left: {{text.x}}px; top: {{text.y}}px;" >
+            {{ text.s }}
+        </div>
+
+    </div>
+
+
+
+</div>
+
+    <div class="col-md-4" style="border: solid 1px black; padding:10px; ">
+
+<ul>
+    <li ng-repeat="invoice in invoices">{{invoice}}</li>
+</ul>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+    (function() {
+
+        angular
+                .module("appName", [])
+                .controller("MainController", MainController);
+
+        function MainController($scope, $http) {
+            $scope.message = "Hello, Michael";
+
+            $http({
+                method: 'GET',
+                url: '/pdfjson'
+            }).then(function successCallback(response) {
+
+                var pages = [];
+
+                response.data.Pages.forEach(function(pdfPage) {
+                    var page = {texts: []};
+
+                    pdfPage.Texts.forEach(function(pdfText) {
+
+                        var text = {
+                            s:pdfText.R[0].T,
+                            s2: pdfText.R[0].T2,
+                            x:pdfText.x * 10,
+                            y:pdfText.y * 34
+                        };
+
+                        page.texts.push(text);
+
+                    });
+
+                    pages.push(page);
+
+                });
+
+
+                $scope.pages = pages;
+                console.log(pages);
+
+            }, function errorCallback(response) {
+            });
+
+
+            $http({
+                method: 'GET',
+                url: '/getInvoices'
+            }).then(function successCallback(response) {
+
+                $scope.invoices = response.data;
+
+            }, function errorCallback(response) {
+            });
+
+
+
+
+        };
+
+
+    })();
+
+
+</script>
+
+
+
+
+</body>
+</html>
