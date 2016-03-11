@@ -31,13 +31,22 @@ app.get('/getInvoices', function(req, res) {
         items = items.filter(function(filename) { return filename.toLowerCase().endsWith('.pdf');  })
 
         res.json(items);
+    });
+});
 
 
+app.get('/getInvoice/:filename', function(req, res) {
+    var filename = req.params.filename;
 
+    var pdfParser = require('./pdfParser');
+
+    pdfParser(filename, function(parsedDoc) {
+        res.json(parsedDoc);
     });
 
 
 });
+
 
 
 app.listen(3000, function () {
